@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="main.css">
+    <title>ArtyRubtsov 3D</title>
+</head>
+
+<body>
+    <script type="module">
+        //modules imports
+        import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.114/build/three.module.js";
+        import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.114/examples/jsm/controls/OrbitControls.js";
+        import { DragControls } from "https://cdn.jsdelivr.net/npm/three@0.114/examples/jsm/controls/DragControls.js";
+        import { FlyControls } from "https://cdn.jsdelivr.net/npm/three@0.114/examples/jsm/controls/FlyControls.js";
+        import { SkinnedMesh } from "https://cdn.jsdelivr.net/npm/three@0.114/src/objects/SkinnedMesh.js";
+
+        //varibles
+
+        //textures loader 
+        const loader = new THREE.CubeTextureLoader();
+
+        //resize handler
+        window.addEventListener('resize', onWindowResize, false);
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        //creating the scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+
+        //loading check
+        const manager = new THREE.LoadingManager();
+        THREE.DefaultLoadingManager.onProgress = function (item, loaded, total) {
+            if (loaded === total) {
+                torusKnot.material.color.setHex(0xffffff);
+            }
+        };
+
+        //sound setup 
+        let isMusicPlaying = false
+        const listener = new THREE.AudioListener();
+        camera.add(listener);
+        const sound = new THREE.Audio(listener);
+        const audioLoader = new THREE.AudioLoader();
+        audioLoader.load('sounds/embient.mp3', function (buffer) {
+            sound.setBuffer(buffer);
+            sound.setLoop(true);
+            sound.setVolume(0.5);
+        });
+        const soundControl = document.querySelector('#soundControl')
+        soundControl.addEventListener('click', () => {
+            if (isMusicPlaying) {
+                soundControl.innerHTML = 'play sound'
+                isMusicPlaying = false
+                sound.pause()
+            }
+            else {
+                soundControl.innerHTML = 'mute sound'
+                isMusicPlaying = true
+                sound.play()
+            }
+        })
+
+
+        //animation figure 1
+        var geometry = new THREE.SphereBufferGeometry(50, 10, 10);
+        var material = new THREE.MeshPhongMaterial({ color: 0xffff00 });
+        const sphere = new THREE.Mesh(geometry, material);
+        sphere.position.set(30, 30, -100)
+        scene.add(sphere);
+
+        //animation figure 2
+        var DodecahedronGeometry = new THREE.DodecahedronGeometry(40)
+        var basicMaterial = new THREE.MeshNormalMaterial({color: 0x0095DD});
+         var Dodecahedron= new THREE.Mesh(DodecahedronGeometry, basicMaterial);
+        Dodecahedron.position.set(-90, 30, -100)
+        scene.add(Dodecahedron);
+
+        //animation figure 3
+        var boxGeometry = new THREE.BoxGeometry(70, 70, 70);
+        var basicMaterial = new THREE.MeshNormalMaterial({color: 0x0095DD});
+        var cube = new THREE.Mesh(boxGeometry, basicMaterial);
+        cube.position.set(-90, 30, -100)
+        scene.add(cube);
+
+        //matrix figure 
+        var geometry = new THREE.CylinderBufferGeometry(30, 30, 80, 32);
+        var material = new THREE.MeshPhongMaterial({ color: 0xffff00 });
+        const cylinder = new THREE.Mesh(geometry, material);
+        cylinder.position.set(-90, 30, -100)
+        scene.add(cylinder);
+
+        //figure changes color from yellow to white when scene is loaded
+        var geometry = new THREE.TorusKnotBufferGeometry(10, 3, 100, 16);
+        var material = new THREE.MeshPhongMaterial({ color: 0xffff00 });
+        var torusKnot = new THREE.Mesh(geometry, material);
+        torusKnot.position.set(330, 30, -100)
+        scene.add(torusKnot);
+
+        //dragable element
+        var geometry = new THREE.TorusBufferGeometry(30, 15, 16, 100);
+        var material = new THREE.MeshPhongMaterial({ color: 0xffff00 });
+        var torus = new THREE.Mesh(geometry, material);
+        torus.position.set(510, 30, -100)
+        scene.add(torus);
+
+        //dragable element
+        var geometry = new THREE.CylinderBufferGeometry(30, 15, 16, 100);
+        var material = new THREE.MeshPhongMaterial({ color: 0xffff00 });
+        var torus = new THREE.Mesh(geometry, material);
+        cylinder.position.set(150, 30, -100)
+        scene.add(cylinder);
+
+        
+
+        //shape geometry figure
+        var x = 0, y = 0;
+        var myShape = new THREE.Shape();
+        myShape.moveTo(x + 10 * 2.5, y + 10 * 2.5);
+        myShape.bezierCurveTo(x + 5 * 2.5, y + 5 * 2.5, x + 4 * 2.5, y, x, y);
+        myShape.bezierCurveTo(x - 6 * 2.5, y, x - 6 * 2.5, y + 7 * 2.5, x - 6 * 2.5, y + 7 * 2.5);
+        myShape.bezierCurveTo(x - 6 * 2.5, y + 11 * 2.5, x - 3 * 2.5, y + 15.4 * 2.5, x + 5 * 2.5, y + 19 * 2.5);
+        myShape.bezierCurveTo(x + 12 * 2.5, y + 15.4 * 2.5, x + 16 * 2.5, y + 11 * 2.5, x + 16 * 2.5, y + 7 * 2.5);
+        myShape.bezierCurveTo(x + 16 * 2.5, y + 7 * 2.5, x + 16 * 2.5, y, x + 10 * 2.5, y);
+        myShape.bezierCurveTo(x + 7 * 2.5, y, x + 5 * 2.5, y + 5 * 2.5, x + 5 * 2.5, y + 5 * 2.5);
+        
+        var geometry = new THREE.ShapeGeometry(myShape)
+        var material = new THREE.MeshStandardMaterial({ color: 0xFF0000 })
+        var shapeFigure = new THREE.Mesh(geometry, material)
+        var extrudeSettings = { amount: 8, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 }
+        shapeFigure.position.set(-420, 30, -100)
+        shapeFigure.rotation.y = 0
+        shapeFigure.rotation.z = 3
+        shapeFigure.depth = 0
+        scene.add(shapeFigure)
+
+       
+
+        
+       
+      
+
+     
+  
+       
+        //skeleton figure
+
+        function createGeometry(sizing) {
+            var geometry = new THREE.CylinderBufferGeometry(
+                15, // radiusTop
+                15, // radiusBottom
+                sizing.height, // height
+                8, // radiusSegments
+                sizing.segmentCount * 3, // heightSegments
+                true // openEnded
+            );
+            var position = geometry.attributes.position;
+            var vertex = new THREE.Vector3();
+            var skinIndices = [];
+            var skinWeights = [];
+            for (var i = 0; i < position.count; i++) {
+                vertex.fromBufferAttribute(position, i);
+                var y = (vertex.y + sizing.halfHeight);
+                var skinIndex = Math.floor(y / sizing.segmentHeight);
+                var skinWeight = (y % sizing.segmentHeight) / sizing.segmentHeight;
+                skinIndices.push(skinIndex, skinIndex + 1, 0, 0);
+                skinWeights.push(1 - skinWeight, skinWeight, 0, 0);
+            }
+            geometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 4));
+            geometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 4));
+            return geometry;
+        }
+
+        function createBones(sizing) {
+            let bones = [];
+            var prevBone = new THREE.Bone();
+            bones.push(prevBone);
+            prevBone.position.y = - sizing.halfHeight;
+            for (var i = 0; i < sizing.segmentCount; i++) {
+                var bone = new THREE.Bone();
+                bone.position.y = sizing.segmentHeight;
+                bones.push(bone);
+                prevBone.add(bone);
+                prevBone = bone;
+
+            }
+            return bones;
+        }
+
+
+        function createMesh(geometry, bones) {
+            var material = new THREE.MeshPhongMaterial({
+                skinning: true,
+                color: 0x156289,
+                emissive: 0x072534,
+                side: THREE.DoubleSide,
+                flatShading: true
+            });
+            var mesh = new THREE.SkinnedMesh(geometry, material);
+            var skeleton = new THREE.Skeleton(bones);
+            mesh.add(bones[0]);
+            mesh.bind(skeleton);
+            let skeletonHelper = new THREE.SkeletonHelper(mesh);
+            skeletonHelper.material.linewidth = 5;
+            scene.add(skeletonHelper);
+            return mesh;
+        }
+
+        let  bonesMesh = null
+        function initBones() {
+            var segmentHeight = 30;
+            var segmentCount = 4;
+            var height = segmentHeight * segmentCount;
+            var halfHeight = height * 0.5;
+            var sizing = {
+                segmentHeight: segmentHeight,
+                segmentCount: segmentCount,
+                height: height,
+                halfHeight: halfHeight
+            };
+            var geometry = createGeometry(sizing);
+            var bones = createBones(sizing);
+            bonesMesh = createMesh(geometry, bones);
+            bonesMesh.scale.multiplyScalar(1);
+            bonesMesh.position.set(-650, 40, -100)
+            scene.add(bonesMesh);
+
+        }
+
+         
+
+        //text
+        var fontLoader = new THREE.FontLoader()
+
+        fontLoader.load('fonts/ROBO_Regular.json', function (font) {
+            var animElementsText = new THREE.TextGeometry('3 elements with \n animations', {
+                font: font,
+                size: 20,
+                height: 2,
+                curveSegments: 12,
+                bevelEnabled: false,
+                bevelThickness: 10,
+                bevelSize: 8,
+                bevelOffset: 5,
+                bevelSegments: 5
+            });
+            var material = new THREE.MeshLambertMaterial({color: 0xFFF00});
+            var animationText = new THREE.Mesh(animElementsText, material);
+            animationText.position.set(-70, 170, -100);
+            scene.add(animationText);
+
+            var matrixElementText = new THREE.TextGeometry('Matrix \n transformations', {
+                font: font,
+                size: 15,
+                height: 2,
+                curveSegments: 12,
+                bevelEnabled: false,
+                bevelThickness: 10,
+                bevelSize: 8,
+                bevelOffset: 0,
+                bevelSegments: 5
+            });
+            var material = new THREE.MeshLambertMaterial({ color: 0x6699ff });
+            var matrixText = new THREE.Mesh(matrixElementText, material);
+            matrixText.position.set(-330, 130, -100)
+            scene.add(matrixText);
+
+            var matrixElementText = new THREE.TextGeometry('Element changes \n color when \n scene is loaded', {
+                font: font,
+                size: 15,
+                height: 2,
+                curveSegments: 12,
+                bevelEnabled: false,
+                bevelThickness: 10,
+                bevelSize: 8,
+                bevelOffset: 0,
+                bevelSegments: 5
+            });
+            var material = new THREE.MeshLambertMaterial({ color: 0xff9966});
+            var matrixText = new THREE.Mesh(matrixElementText, material);
+            matrixText.position.set(240, 130, -100)
+            scene.add(matrixText);
+
+            var shapeGeomText = new THREE.TextGeometry('Shape geometry \n figure', {
+                font: font,
+                size: 15,
+                height: 2,
+                curveSegments: 12,
+                bevelEnabled: false,
+                bevelThickness: 10,
+                bevelSize: 8,
+                bevelOffset: 0,
+                bevelSegments: 5
+            });
+            var material = new THREE.MeshLambertMaterial({ color: 0xBC8F8F });
+            var shapeText = new THREE.Mesh(shapeGeomText, material);
+            shapeText.position.set(-510, 80, -100)
+            scene.add(shapeText);
+
+            var dragableEmlemText = new THREE.TextGeometry('Dragable element', {
+                font: font,
+                size: 15,
+                height: 2,
+                curveSegments: 12,
+                bevelEnabled: false,
+                bevelThickness: 10,
+                bevelSize: 8,
+                bevelOffset: 0,
+                bevelSegments: 5
+            });
+            var material = new THREE.MeshLambertMaterial({ color: 0x2F4F4F });
+            var dragText = new THREE.Mesh(dragableEmlemText, material);
+            dragText.position.set(430, 120, -100)
+            scene.add(dragText);
+
+            var dragableEmlemText = new THREE.TextGeometry('Skeleton \n element', {
+                font: font,
+                size: 15,
+                height: 2,
+                curveSegments: 12,
+                bevelEnabled: false,
+                bevelThickness: 10,
+                bevelSize: 8,
+                bevelOffset: 0,
+                bevelSegments: 5
+            });
+            var material = new THREE.MeshLambertMaterial({ color: 0x7FFFD4 });
+            var dragText = new THREE.Mesh(dragableEmlemText, material);
+            dragText.position.set(-650, 140, -100)
+            scene.add(dragText);
+        });
+
+       
+
+
+        //point light setup 
+        const light = new THREE.PointLight(0xffffff, 1, 0);
+        light.position.set(0, 100, 200);
+        light.power = 10
+        scene.add(light);
+
+        const light2 = new THREE.PointLight(0xffffff, 1, 0);
+        light2.position.set(0, 100, -50);
+        light2.power = 5
+        scene.add(light2);
+
+        //skybox loader
+        const morningSky = [
+            'img/skybox/morning/haze_ft.jpg', 'img/skybox/morning/haze_bk.jpg',
+            'img/skybox/morning/haze_up.jpg', 'img/skybox/morning/haze_dn.jpg',
+            'img/skybox/morning/haze_rt.jpg', 'img/skybox/morning/haze_lf.jpg'
+        ]
+        const nightSky = [
+            'img/skybox/night/sleepyhollow_ft.jpg', 'img/skybox/night/sleepyhollow_bk.jpg',
+            'img/skybox/night/sleepyhollow_up.jpg', 'img/skybox/night/sleepyhollow_dn.jpg',
+            'img/skybox/night/sleepyhollow_rt.jpg', 'img/skybox/night/sleepyhollow_lf.jpg'
+        ]
+        let hours = new Date().getHours()
+        function setSkybox(time) {
+            const skybox = loader.load(time > 5 && time < 22 ? morningSky : nightSky)
+            scene.background = skybox
+        }
+        setSkybox(hours)
+
+        //orbit controls setup
+        var controls = new OrbitControls(camera, renderer.domElement);
+        controls.update();
+        //drag contols setup
+        var dragControls = new DragControls([torus, cube, torusKnot], camera, renderer.domElement);
+        dragControls.addEventListener('dragstart', function () {controls.enabled = false;});
+        dragControls.addEventListener('dragend', function () {controls.enabled = true;});
+
+        //camera setup
+        camera.position.set(0, 100, 400);
+
+        let animationLoop = false
+        let matrixIndex = 1
+        Dodecahedron.matrixAutoUpdate = false
+        //scene rendering
+        initBones()
+        function animate() {
+            //figures animations
+            cube.rotation.z += 0.02
+            cube.rotation.x += 0.02
+            cube.rotation.y += 0.02
+
+            
+
+            if (sphere.position.y < 0 && !animationLoop) {
+                animationLoop = true
+            }
+            else if (sphere.position.y > 65 && animationLoop) {
+                animationLoop = false
+            }
+
+            //matrix transformations
+            const m = new THREE.Matrix4().set(
+                matrixIndex, 0, 0, 0, 0, matrixIndex, 0, 0, 0, 1, matrixIndex, 0, 0, 0, 0, 1)
+                Dodecahedron.matrix.copy(m)
+                Dodecahedron.matrix.setPosition(-240, 30, -100)
+
+            if (!animationLoop) {
+                bonesMesh.skeleton.bones[1].position.x -= 1
+                bonesMesh.skeleton.bones[4].position.x -= 1
+                sphere.position.y -= 1
+                cylinder.scale.x -= 0.01
+                matrixIndex -= 0.01
+            }
+            else {
+                bonesMesh.skeleton.bones[1].position.x += 1
+                bonesMesh.skeleton.bones[4].position.x += 1
+                sphere.position.y += 1
+                cylinder.scale.x += 0.01
+                matrixIndex += 0.01
+            }
+
+
+            //render
+            requestAnimationFrame(animate);
+
+            controls.update();
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        //controls setup 
+        document.querySelector('#switchDay').addEventListener('click', () => {
+            changeSkybox('day')
+            setSkybox(hours)
+        })
+        document.querySelector('#switchNight').addEventListener('click', () => {
+            changeSkybox('night')
+            setSkybox(hours)
+        })
+        document.querySelector('#switchCurrent').addEventListener('click', () => {
+            changeSkybox('current')
+            setSkybox(hours)
+        })
+        function changeSkybox(state) {
+            if (state !== undefined || state !== null) {
+                switch (state) {
+                    case 'day':
+                        hours = 13
+                        break;
+                    case 'night':
+                        hours = 1
+                        break;
+                    case 'current':
+                        hours = new Date().getHours()
+                        break;
+                }
+            }
+        }
+    </script>
+    <div class="controls">
+        <div class="buttons">
+            <button id="switchDay">set day</button>
+            <button id="switchNight">set night</button>
+            <button id="switchCurrent">set current time</button>
+            <button id="soundControl">play sound</button> <br />
+        </div>
+        <div class="instructions">
+            move with <img src="img/stuff/arrows.png" alt="Arrow buttons">
+        </div>
+    </div>
+</body>
+
+</html>

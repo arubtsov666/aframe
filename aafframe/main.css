@@ -1,0 +1,44 @@
+body {
+    position: relative;
+    margin: 90;
+}
+canvas {
+    display: block;
+}
+
+.controls {
+    width: 98%;
+    padding: 0 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    position: absolute;
+    top: 870px;
+    left: 1px;
+    font-family: 'Century Gothic', sans-serif;
+}
+
+.controls button {
+    background-color: rgb(14, 101, 231);
+    color: #fff;
+    border-radius: 5px;
+    padding: 10px 15px;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.instructions {
+    display: flex;
+    align-items: center;
+    background-color: rgb(14, 101, 231);
+    color: #fff;
+    padding: 5px 15px;
+    border-radius: 5px;
+}
+
+.instructions img{
+    height: 40px;
+    margin-left: 20px;;
+}
